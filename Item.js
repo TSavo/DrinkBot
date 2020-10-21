@@ -137,7 +137,7 @@ export function getItemResultEmbed(name, items, url) {
     const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle(name)
-        //.setURL(url)
+        .setURL(url)
         //.setThumbnail('https://klwines.com/Content/images/logo_new.svg')
         .addFields(fields)
         //.setImage('https://klwines.com/Content/images/logo_new.svg')
