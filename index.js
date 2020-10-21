@@ -14,13 +14,6 @@ import Item, {
 } from "./Item.js";
 import asyncForEach from "./asyncForEach.js";
 
-const searchUrls = {
-    "K&L Wines":"https://www.klwines.com/Products?searchText=",
-    "Seelbach's":"https://seelbachs.com/search?q=",
-    "Woodland Hills Wine Company":"https://whwc.com/search?search_query=",
-    "Bitters And Bottles":"https://www.bittersandbottles.com/search?type=product&q="
-};
-
 async function start() {
     const db = new MongoDB();
     await db.init();
@@ -96,7 +89,7 @@ async function start() {
                 if(items.length == 0){
                     return;
                 }
-                let embed = getItemResultEmbed(items[0].store + " Search Results for '" + keyword + "'", items, searchUrls[items[0].store] + keyword);        
+                let embed = getItemResultEmbed(items[0].store + " Search Results for '" + keyword + "'", items, keyword);        
                 await message.channel.send(embed);
             });
         }

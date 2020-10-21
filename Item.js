@@ -9,7 +9,15 @@ const {
 const storeImages = {
     "K&L Wines": "https://pbs.twimg.com/profile_images/378800000144695467/f2a35e2847d71bcd32b77a9f73f0d45b_400x400.png",
     "Bitters And Bottles": "https://cdn.knoji.com/images/logo/bittersandbottlescom.jpg",
-    "Seelbach's": "https://cdn.shopify.com/s/files/1/1829/2275/files/seelbachs_final_BW_300x.jpg?v=1572457767"
+    "Seelbach's": "https://cdn.shopify.com/s/files/1/1829/2275/files/seelbachs_final_BW_300x.jpg?v=1572457767",
+    "Woodland Hills Wine Company":"https://scontent-lax3-1.xx.fbcdn.net/v/t1.0-9/998644_10151749884251644_796753210_n.jpg?_nc_cat=105&_nc_sid=85a577&_nc_ohc=qgImdg6DGj8AX8AWmhN&_nc_ht=scontent-lax3-1.xx&oh=934cf3397c3ba6fb15a93b6c1ded1489&oe=5FB64294"
+};
+
+const searchUrls = {
+    "K&L Wines":"https://www.klwines.com/Products?searchText=",
+    "Seelbach's":"https://seelbachs.com/search?q=",
+    "Woodland Hills Wine Company":"https://whwc.com/search?search_query=",
+    "Bitters And Bottles":"https://www.bittersandbottles.com/search?type=product&q="
 };
 
 export default class Item {
@@ -92,7 +100,7 @@ async function fetchHTML(url) {
     return cheerio.load(data);
 }
 
-export function getItemResultEmbed(name, items, url) {
+export function getItemResultEmbed(name, items, keyword) {
     const fields = items.flatMap(item => {
         const field = [{
                 name: "Name",
@@ -137,8 +145,8 @@ export function getItemResultEmbed(name, items, url) {
     const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle(name)
-        .setURL(url)
-        //.setThumbnail('https://klwines.com/Content/images/logo_new.svg')
+        .setURL(searchUrls[items[0].store] + keyword)
+        .setThumbnail(storeImages[items[0].store])
         .addFields(fields)
         //.setImage('https://klwines.com/Content/images/logo_new.svg')
         .setTimestamp();
