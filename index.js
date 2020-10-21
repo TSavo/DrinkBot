@@ -175,8 +175,8 @@ async function start() {
             await message.channel.send(embed);
         }
     });
-    console.log(process.env.DISCORD_API_KEY);
-    client.login(process.env.DISCORD_API_KEY).catch(console.log);
+    const apiKey = console.log(process.env.DISCORD_API_KEY).trim();
+    client.login(apiKey).catch(console.log);
     //client.login("NzYzNTg3NzQ1OTM4NTM4NTI5.X354gQ.-goiz1Arqa4h-OlwumehkedoK_o").catch(e => console.log);
 }
 start().catch(e => console.log);
