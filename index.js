@@ -16,9 +16,9 @@ import asyncForEach from "./asyncForEach.js";
 
 const searchUrls = {
     "K&L Wines":"https://www.klwines.com/Products?searchText=",
-    "Seelbach's":"",
+    "Seelbach's":"https://seelbachs.com/search?q=",
     "Woodland Hills Wine Company":"https://whwc.com/search?search_query=",
-    "Bitters And Bottles":""
+    "Bitters And Bottles":"https://www.bittersandbottles.com/search?type=product&q="
 };
 
 async function start() {
@@ -96,7 +96,7 @@ async function start() {
                 if(items.length == 0){
                     return;
                 }
-                let embed = getItemResultEmbed(items[0].store + " Search Results for '" + keyword + "'", items, "https://www.klwines.com/Products?searchText=" + keyword);        
+                let embed = getItemResultEmbed(items[0].store + " Search Results for '" + keyword + "'", items, searchUrls[items[0].store] + keyword);        
                 await message.channel.send(embed);
             });
         }
@@ -176,7 +176,6 @@ async function start() {
         }
     });
     const apiKey = process.env.DISCORD_API_KEY.trim();
-    console.log(apiKey);
     client.login(apiKey).catch(console.log);
 }
 start().catch(e => console.log);
