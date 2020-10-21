@@ -175,7 +175,8 @@ async function start() {
             await message.channel.send(embed);
         }
     });
-    const apiKey = console.log(process.env.DISCORD_API_KEY).trim();
+    const apiKey = process.env.DISCORD_API_KEY.trim();
+    console.log(apiKey);
     client.login(apiKey).catch(console.log);
 }
 start().catch(e => console.log);
