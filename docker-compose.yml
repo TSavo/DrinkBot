@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 services:
   app:
     container_name: app
@@ -8,6 +8,8 @@ services:
       - mongo
     env_file:
       - ./.env
+    volumes:
+      - ./:/app
   mongo:
     container_name: mongo
     image: mongo

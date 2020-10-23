@@ -96,7 +96,7 @@ export default class Item {
 async function fetchHTML(url) {
     const {
         data
-    } = await axios.get(url);
+    } = await axios.get(url).catch(console.log);
     return cheerio.load(data);
 }
 
