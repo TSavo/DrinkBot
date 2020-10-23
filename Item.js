@@ -10,14 +10,14 @@ const storeImages = {
     "K&L Wines": "https://pbs.twimg.com/profile_images/378800000144695467/f2a35e2847d71bcd32b77a9f73f0d45b_400x400.png",
     "Bitters And Bottles": "https://cdn.knoji.com/images/logo/bittersandbottlescom.jpg",
     "Seelbach's": "https://cdn.shopify.com/s/files/1/1829/2275/files/seelbachs_final_BW_300x.jpg?v=1572457767",
-    "Woodland Hills Wine Company":"https://scontent-lax3-1.xx.fbcdn.net/v/t1.0-9/998644_10151749884251644_796753210_n.jpg?_nc_cat=105&_nc_sid=85a577&_nc_ohc=qgImdg6DGj8AX8AWmhN&_nc_ht=scontent-lax3-1.xx&oh=934cf3397c3ba6fb15a93b6c1ded1489&oe=5FB64294"
+    "Woodland Hills Wine Company": "https://scontent-lax3-1.xx.fbcdn.net/v/t1.0-9/998644_10151749884251644_796753210_n.jpg?_nc_cat=105&_nc_sid=85a577&_nc_ohc=qgImdg6DGj8AX8AWmhN&_nc_ht=scontent-lax3-1.xx&oh=934cf3397c3ba6fb15a93b6c1ded1489&oe=5FB64294"
 };
 
 const searchUrls = {
-    "K&L Wines":"https://www.klwines.com/Products?searchText=",
-    "Seelbach's":"https://seelbachs.com/search?q=",
-    "Woodland Hills Wine Company":"https://whwc.com/search?search_query=",
-    "Bitters And Bottles":"https://www.bittersandbottles.com/search?type=product&q="
+    "K&L Wines": "https://www.klwines.com/Products?searchText=",
+    "Seelbach's": "https://seelbachs.com/search?q=",
+    "Woodland Hills Wine Company": "https://whwc.com/search?search_query=",
+    "Bitters And Bottles": "https://www.bittersandbottles.com/search?type=product&q="
 };
 
 export default class Item {
@@ -94,10 +94,15 @@ export default class Item {
 }
 
 async function fetchHTML(url) {
-    const {
-        data
-    } = await axios.get(url).catch(console.log);
-    return cheerio.load(data);
+    try {
+        const {
+            data
+        } = await axios.get(url);
+        return cheerio.load(data);
+    } catch (e) {
+        console.log(e);
+        return undefined;
+    }
 }
 
 export function getItemResultEmbed(name, items, keyword) {
@@ -133,11 +138,11 @@ export function getItemResultEmbed(name, items, keyword) {
                 inline: true
             });
         }
-        if(item.store) {
+        if (item.store) {
             field.push({
                 name: "Store",
                 value: item.store,
-                inline:true
+                inline: true
             });
         }
         return field;
@@ -155,6 +160,9 @@ export function getItemResultEmbed(name, items, keyword) {
 
 export async function getKLSearchResults(keyword) {
     const $ = await fetchHTML("https://klwines.com/Products?searchText=" + keyword);
+    if(!$){
+        return [];
+    }
     const content = $(".tf-product");
     const items = [];
     content.each((index, element) => {
@@ -176,6 +184,9 @@ export async function getKLSearchResults(keyword) {
 
 export async function getKLNewItems() {
     const $ = await fetchHTML("https://klwines.com/Products?filters=sv2_NewProductFeedYN%24eq%241%24True%24ProductFeed%24!dflt-stock-all&orderBy=NewProductFeedDate%20desc&limit=50");
+    if(!$){
+        return [];
+    }
     let items = [];
     $('tr').each((index, tr) => {
         let releaseDate;
@@ -221,13 +232,16 @@ export async function getKLNewItems() {
 
 export async function getBABNewItems() {
     const $ = await fetchHTML("https://www.bittersandbottles.com/collections/new-arrivals?sort_by=created-descending");
+    if(!$){
+        return [];
+    }
     let items = [];
     $('li.productgrid--item').each((index, li) => {
-        
+
         $(li).find("script").each((index, element) => {
-            if(element.children[0].data.trim().startsWith("{")){
+            if (element.children[0].data.trim().startsWith("{")) {
                 const data = JSON.parse(element.children[0].data.trim());
-                if(data.id){
+                if (data.id) {
                     let price = (data.price / 100).toFixed(2);
                     let name = data.title;
                     let releaseDate = new Date();
@@ -238,7 +252,7 @@ export async function getBABNewItems() {
                     items.push(new Item(releaseDate, sku, undefined, name, price, quantity, undefined, "Bitters And Bottles", url, image));
                 }
             }
-            
+
         });
     });
     return items;
@@ -246,12 +260,15 @@ export async function getBABNewItems() {
 
 export async function getBABSearchResults(keyword) {
     const $ = await fetchHTML("https://www.bittersandbottles.com/search?type=product&q=" + keyword);
+    if(!$){
+        return [];
+    }
     let items = [];
     $('li.productgrid--item').each((index, li) => {
         $(li).find("script").each((index, element) => {
-            if(element.children[0].data.trim().startsWith("{")){
+            if (element.children[0].data.trim().startsWith("{")) {
                 const data = JSON.parse(element.children[0].data.trim());
-                if(data.id){
+                if (data.id) {
                     let price = (data.price / 100).toFixed(2);
                     let name = data.title;
                     let releaseDate = new Date();
@@ -262,7 +279,7 @@ export async function getBABSearchResults(keyword) {
                     items.push(new Item(releaseDate, sku, undefined, name, price, quantity, undefined, "Bitters And Bottles", url, image));
                 }
             }
-            
+
         });
     });
     return items;
@@ -270,6 +287,9 @@ export async function getBABSearchResults(keyword) {
 
 export async function getSeelbachsNewItems() {
     const $ = await fetchHTML("https://seelbachs.com/collections/frontpage?sort_by=created-descending");
+    if(!$){
+        return [];
+    }
     let items = [];
     $('.grid-view-item__link').each((index, item) => {
         const image = "https:" + $(item).find(".grid-view-item__image")[0].attribs.src;
@@ -280,17 +300,20 @@ export async function getSeelbachsNewItems() {
         const url = "https://seelbachs.com" + item.attribs.href.replace("collections/frontpage/", "");
         const releaseDate = new Date();
         items.push(new Item(releaseDate, sku, undefined, name, price, quantity, undefined, "Seelbach's", url, image));
-       
+
     });
     return items;
 }
 
 export async function getSeelbachsSearchResults(keyword) {
     const $ = await fetchHTML("https://seelbachs.com/search?q=" + keyword);
+    if(!$){
+        return [];
+    }
     let items = [];
     $('.list-view-item').each((index, item) => {
         const imageElement = $(item).find(".list-view-item__image")[0];
-        if(!imageElement){
+        if (!imageElement) {
             return;
         }
         const image = "https:" + imageElement.attribs.src;
@@ -309,6 +332,9 @@ export async function getWHWCNewItems() {
     const {
         data
     } = await axios.get("https://api.searchspring.net/api/search/search.json?ajaxCatalog=v3&resultsFormat=native&siteId=rn9t48&domain=https%3A%2F%2Fwhwc.com%2Ftrending%2Fwhats-new%2Fnew-arrivals-this-week%2F&bgfilter.categories_hierarchy=Trending%3EWhat%27s%20New%3ENew%20Arrivals%20This%20Week&q=&userId=V3-8387EF88-B261-43F9-BAC4-3F68DF1E3C40&tracking=true");
+    if(!data){
+        return [];
+    }
     data.results.forEach(item => {
         const image = item.imageUrl;
         const name = item.name;
@@ -320,11 +346,11 @@ export async function getWHWCNewItems() {
         items.push(new Item(new Date(), sku, undefined, name, price, quantity, undefined, store, url, image));
     });
     let nextPage = data.pagination.nextPage;
-    while(nextPage != 0){
+    while (nextPage != 0) {
         const {
             data2
         } = await axios.get("https://api.searchspring.net/api/search/search.json?ajaxCatalog=v3&resultsFormat=native&siteId=rn9t48&domain=https%3A%2F%2Fwhwc.com%2Ftrending%2Fwhats-new%2Fnew-arrivals-this-week%2F%3Fp%3D2&bgfilter.categories_hierarchy=Trending%3EWhat%27s%20New%3ENew%20Arrivals%20This%20Week&q=&page=2&userId=V3-8387EF88-B261-43F9-BAC4-3F68DF1E3C40&tracking=true");
-        if(!data2){
+        if (!data2) {
             nextPage = 0;
             continue;
         }
@@ -340,15 +366,18 @@ export async function getWHWCNewItems() {
         });
         nextPage = data2.pagination.nextPage;
     }
-   
+
     return items;
 }
 
-export async function getWHWCSearchResults(keyword){
+export async function getWHWCSearchResults(keyword) {
     const items = [];
     const {
         data
     } = await axios.get("https://api.searchspring.net/api/search/search.json?ajaxCatalog=v3&resultsFormat=native&siteId=rn9t48&domain=https%3A%2F%2Fwhwc.com%2Fsearch%3Fsearch_query%3Dlittle&q=" + keyword + "&userId=93F386F2-55CC-41F3-92A6-0743C05569E9&tracking=true");
+    if(!data){
+        return [];
+    }
     data.results.forEach(item => {
         const image = item.imageUrl;
         const name = item.name;
@@ -359,10 +388,9 @@ export async function getWHWCSearchResults(keyword){
         const store = "Woodland Hills Wine Company";
         items.push(new Item(new Date(), sku, undefined, name, price, quantity, undefined, store, url, image));
     });
-    if(items.length > 8){
-        return items.slice(0,7);
+    if (items.length > 8) {
+        return items.slice(0, 7);
     }
     return items;
 
 }
-
